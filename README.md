@@ -43,3 +43,24 @@ If there is no audio description in the video, we observed two cases.
 2. Text blocks are present in the video(like this one: https://www.youtube.com/watch?v=j1Jq8JjvSMc ) that can provide us with some information on the recipe. We can extract those blocks using OpenCV object and text detection models to extract information from them, and then we can use the GPT and Gemini LLM-based approaches to complete the relevant information in a structured format.
 
 If time allows, we will try to overcome these challenges.
+
+# HOW TO RUN
+1. Download latest python version
+2. Download an IDE (VS code, pycharm)
+3. Create a new python environment
+4. Run this command 
+    pip install openai-whisper torch
+5. Downlaod ffmpeg from the official website
+6. Install the executable zip file as per your OS
+7. Extract it in C directory C:/ffmpeg< version number >
+8. Open this folder, go in bin folder and copy the path of this location
+9. Open environment variables setting on your system -> Edit environment variables
+    -> Under system variables -> Click Path -> Click Edit button 
+    New window appears -> Click new -> Paste the location path that you copied
+    -> Click OK to save
+10. Restart the IDE
+11. Run the files. 
+
+
+12. Next, Get the Google Gemini 1.5FLash API key
+13. Run this command pip install -q -U google-generativeai
