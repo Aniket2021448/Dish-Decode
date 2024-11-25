@@ -3,3 +3,4 @@ whisper
 requests
 gunicorn
 google-generativeai
+python-dotenv
