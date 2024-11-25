@@ -159,7 +159,7 @@ import os
 import subprocess
 import whisper
 import requests
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, render_template
 import tempfile
 
 app = Flask(__name__)
@@ -191,7 +191,9 @@ print("Whisper AI model loaded successfully.")
 def health_check():
     return jsonify({"status": "success", "message": "API is running successfully!"}), 200
 
-
+@app.route("/mbsa")
+def mbsa():
+    return render_template("mbsa.html")
 
 @app.route('/process-video', methods=['POST'])
 def process_video():
