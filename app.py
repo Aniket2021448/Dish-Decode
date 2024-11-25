@@ -313,6 +313,3 @@ def query_gemini_api(transcription):
         print(f"Error querying Gemini API: {e}")
         return {"error": str(e)}
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
