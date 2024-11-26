@@ -44,3 +44,23 @@ finally:
     if os.path.exists(wav_file_path):
         os.remove(wav_file_path)
         print(f"Temporary WAV file deleted: {wav_file_path}")
+
+
+
+# # URL of the Flask endpoint
+# url = "https://goodml-dishdecode.hf.space/process-youtube"
+
+# # Data to send in the request (YouTube video URL)
+# data = {
+#     "youtube_url": "https://www.youtube.com/watch?v=ZJuJ9F0G02A"
+# }
+
+# # Make a POST request to the endpoint
+# response = requests.post(url, json=data)
+
+
+# # Print the response from the server
+# if response.status_code == 200:
+#     print("Response from API:", response.json())
+# else:
+#     print(f"Error: {response.status_code}, {response.text}")
