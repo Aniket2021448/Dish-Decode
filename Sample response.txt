@@ -1,0 +1,81 @@
+(DishDecodeCGAS) D:\COURSES\CGAS\Dish-Decode>python API_hit_first.py
+Request successful! Here's the response:
+**1. Recipe Name:** Beef Wellington
+
+**2. Ingredients List:**
+
+* Fillet of beef (quantity not specified)
+* Olive oil
+* Salt
+* Pepper
+* English mustard (or horseradish)
+* 700g chestnut mushrooms
+* 1 clove garlic, chopped
+* Chestnuts (quantity not specified)
+* Fresh thyme
+* Parma ham (quantity not specified)
+* Puff pastry (quantity not specified)
+* Egg yolk
+* Cling film
+
+
+**3. Steps for Preparation:**
+
+1. Sear the beef fillet in a very hot pan with olive oil, seasoning with salt and pepper. Sear all sides.  
+2. Brush the seared beef with English mustard (or horseradish) while still hot.
+3. Blitz chestnut mushrooms, chopped garlic, salt, pepper, and crumbled chestnuts in a blender.
+4. Cook the mushroom mixture in a hot dry pan until all the water evaporates. Stir in fresh thyme.
+5. Let the mushroom mixture cool.
+6. Overlap slices of Parma ham on cling film, creating a layer to hold the juices.
+7. Spread the cooled mushroom mixture on the Parma ham, leaving a half-inch border.
+8. Place the beef fillet on top of the mushroom mixture.
+9. Carefully lift the Parma ham and wrap it tightly around the beef, creating a cylinder shape with the cling film.
+10. Refrigerate for 15 minutes to firm up.
+11. Wrap the beef in puff pastry, trimming excess pastry and sealing the ends.
+12. Wrap the pastry-covered beef tightly in cling film again and refrigerate for 5 minutes.
+13. Remove cling film. Brush the pastry with egg yolk and score the top with a knife. Sprinkle with salt.  
+14. Bake at 200 degrees for approximately 35 minutes (depending on desired doneness).
+15. Let the Wellington rest for at least 10 minutes before slicing and serving.
+
+
+**4. Cooking Techniques Used:**
+
+* Searing
+* Blitzing/Blending
+* Sautéing/Frying
+* Wrapping
+* Baking
+
+
+**5. Equipment Needed:**
+
+* Hot pan
+* Blender
+* Cling film
+* Knife
+* Pastry brush
+* Oven
+
+
+**6. Nutritional Information (Inferred):**
+
+Nutritional information cannot be accurately provided without knowing the exact quantities of ingredients used.  The dish is high in protein (from beef), fat (from beef, Parma ham, and puff pastry), and carbohydrates (from mushrooms, chestnuts, and puff pastry).  Calorie count would be quite high.
+
+
+**7. Serving size:**
+
+Serving size is not specified, but it's likely to be sufficient for at least 2-4 people, depending on the size of the beef fillet.
+
+
+**8. Special Notes or Variations:**
+
+* Using horseradish instead of English mustard.
+* A traditional recipe uses a chive and spring onion pancake instead of Parma ham.  The Parma ham version is presented as lighter.
+* The Wellington can be prepared the night before baking.
+* Tight wrapping is crucial for even cooking and shape.
+
+
+**9. Festive or Thematic Relevance:**
+
+The recipe is presented as a Christmas alternative to roast turkey, highlighting the use of chestnuts as a seasonal ingredient.
+

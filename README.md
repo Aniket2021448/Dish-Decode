@@ -64,3 +64,9 @@ If time allows, we will try to overcome these challenges.
 
 12. Next, Get the Google Gemini 1.5FLash API key
 13. Run this command pip install -q -U google-generativeai
+
+
+
+# Testing with deepgram nova for whisperAI API tasks
+Step1: Get the api key from https://console.deepgram.com/
+Step2: pip install "deepgram-sdk>=3.*,<4.0"
