@@ -67,6 +67,18 @@ If time allows, we will try to overcome these challenges.
 
 
 
-# Testing with deepgram nova for whisperAI API tasks
-Step1: Get the api key from https://console.deepgram.com/
-Step2: pip install "deepgram-sdk>=3.*,<4.0"
+# Testing with deepgram nova for whisperAI API tasks :: Successfull
+Step 1: Get the api key from https://console.deepgram.com/
+Step 2: pip install "deepgram-sdk>=3.*,<4.0"
+Step 3: Get the video converted to .wav at backend using the ffmpeg subprocess command
+        and send it over the API to its server, and it returns a transcript for that video
+Step 4: Then this transcript is sent over the gemini pro API (google based LLM) along with 
+        a promt which tells the LLM to structure the unstructured transcript. 
+Step 5: Then this structured information is sent over to the backend which sense the             
+        response to frontend.        
+
+
+# Testing with Text extraction using OpenCV python to extract information from Video 
+  which has text description in the video
+  https://www.geeksforgeeks.org/text-detection-and-extraction-using-opencv-and-ocr/ 
+  
