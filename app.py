@@ -541,6 +541,7 @@ def query_gemini_api(transcription):
                 }
             ]
         }
+        
         headers = {"Content-Type": "application/json"}
 
         # Send request to Gemini API synchronously
