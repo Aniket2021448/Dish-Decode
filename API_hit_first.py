@@ -55,7 +55,7 @@ url = "https://goodml-dishdecode.hf.space/process-audio"
 audio_url = "https://res.cloudinary.com/dqp1z12my/video/upload/v1733845697/tatta_a3skw0.wav"
 # Beef wellington: https://res.cloudinary.com/dqp1z12my/video/upload/v1733814120/wznl6x77xomzzffujnjh.wav
 # Spiced Baked poridge: https://res.cloudinary.com/dqp1z12my/video/upload/v1733845697/tatta_a3skw0.wav
-# 
+
 try:
     # Step 1: Send the Cloudinary link in a POST request
     print("Sending the audio URL in the POST request...")
