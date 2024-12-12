@@ -6,7 +6,7 @@ import os
 url = "http://127.0.0.1:5000/process-audio"  # Use the updated endpoint
 
 # Path to your local video file
-video_file_path = "D:/COURSES/CGAS/Dish-Decode/thirdVideo.mp4"
+video_file_path = "D:/COURSES/CGAS/Dish-Decode/fourth.mp4"
 
 # Path for the converted WAV file
 wav_file_path = video_file_path.replace(".mp4", ".wav")
@@ -52,10 +52,11 @@ finally:
 # url = "https://goodml-dishdecode.hf.space/process-audio"
 
 # # Cloudinary link to the audio file
-# audio_url = "https://res.cloudinary.com/dqp1z12my/video/upload/v1733845697/tatta_a3skw0.wav"
+# audio_url = "https://res.cloudinary.com/dqp1z12my/video/upload/v1733849188/third_rcflua.wav"
 # # Beef wellington: https://res.cloudinary.com/dqp1z12my/video/upload/v1733814120/wznl6x77xomzzffujnjh.wav
 # # Spiced Baked poridge: https://res.cloudinary.com/dqp1z12my/video/upload/v1733845697/tatta_a3skw0.wav
-
+# # Spicy mexican eggs: https://res.cloudinary.com/dqp1z12my/video/upload/v1733849188/third_rcflua.wav
+# # Tangy fruit salad":  
 # try:
 #     # Step 1: Send the Cloudinary link in a POST request
 #     print("Sending the audio URL in the POST request...")

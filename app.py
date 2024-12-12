@@ -1,344 +1,3 @@
-# # import os
-# # import subprocess
-# # import whisper
-# # import requests
-# # from flask import Flask, request, jsonify, send_file, render_template
-# # import tempfile
-
-# # app = Flask(__name__)
-
-# # # Gemini API settings
-# # from dotenv import load_dotenv
-# # import requests
-# # # Load the .env file
-# # load_dotenv()
-
-# # # Fetch the API key from the .env file
-# # API_KEY = os.getenv("FIRST_API_KEY")
-
-# # # Ensure the API key is loaded correctly
-# # if not API_KEY:
-# #     raise ValueError("API Key not found. Make sure it is set in the .env file.")
-
-# # GEMINI_API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
-# # GEMINI_API_KEY = API_KEY
-
-# # # Load Whisper AI model at startup
-# # print("Loading Whisper AI model...")
-# # whisper_model = whisper.load_model("base")  # Choose model size: tiny, base, small, medium, large
-# # print("Whisper AI model loaded successfully.")
-
-
-# # # Define the "/" endpoint for health check
-# # @app.route("/", methods=["GET"])
-# # def health_check():
-# #     return jsonify({"status": "success", "message": "API is running successfully!"}), 200
-
-# # @app.route("/mbsa")
-# # def mbsa():
-# #     return render_template("mbsa.html")
-
-# # @app.route('/process-video', methods=['POST'])
-# # def process_video():
-# #     """
-# #     Flask endpoint to process video:
-# #     1. Extract audio and transcribe using Whisper AI.
-# #     2. Send transcription to Gemini API for recipe information extraction.
-# #     3. Return structured data in the response.
-# #     """
-# #     if 'video' not in request.files:
-# #         return jsonify({"error": "No video file provided"}), 400
-
-# #     video_file = request.files['video']
-
-# #     try:
-# #         # Save video to a temporary file
-# #         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video_file:
-# #             video_file.save(temp_video_file.name)
-# #             print(f"Video file saved: {temp_video_file.name}")
-
-# #             # Extract audio and transcribe using Whisper AI
-# #             transcription = transcribe_audio(temp_video_file.name)
-
-# #             if not transcription:
-# #                 return jsonify({"error": "Audio transcription failed"}), 500
-
-# #             # Generate structured recipe information using Gemini API
-# #             structured_data = query_gemini_api(transcription)
-
-# #             return jsonify(structured_data)
-
-# #     except Exception as e:
-# #         return jsonify({"error": str(e)}), 500
-
-# #     finally:
-# #         # Clean up temporary files
-# #         if os.path.exists(temp_video_file.name):
-# #             os.remove(temp_video_file.name)
-
-
-# # def transcribe_audio(video_path):
-# #     """
-# #     Extract audio from video file and transcribe using Whisper AI.
-# #     """
-# #     try:
-# #         # Extract audio using ffmpeg
-# #         audio_path = video_path.replace(".mp4", ".wav")
-# #         command = [
-# #             "ffmpeg",
-# #             "-i", video_path,
-# #             "-q:a", "0",
-# #             "-map", "a",
-# #             audio_path
-# #         ]
-# #         subprocess.run(command, check=True)
-# #         print(f"Audio extracted to: {audio_path}")
-
-# #         # Transcribe audio using Whisper AI
-# #         print("Transcribing audio...")
-# #         result = whisper_model.transcribe(audio_path)
-
-# #         # Clean up audio file after transcription
-# #         if os.path.exists(audio_path):
-# #             os.remove(audio_path)
-
-# #         return result.get("text", "").strip()
-
-# #     except Exception as e:
-# #         print(f"Error in transcription: {e}")
-# #         return None
-
-
-# # def query_gemini_api(transcription):
-# #     """
-# #     Send transcription text to Gemini API and fetch structured recipe information.
-# #     """
-# #     try:
-# #         # Define the structured prompt
-# #         prompt = (
-# #             "Analyze the provided cooking video transcription and extract the following structured information:\n"
-# #             "1. Recipe Name: Identify the name of the dish being prepared.\n"
-# #             "2. Ingredients List: Extract a detailed list of ingredients with their respective quantities (if mentioned).\n"
-# #             "3. Steps for Preparation: Provide a step-by-step breakdown of the recipe's preparation process, organized and numbered sequentially.\n"
-# #             "4. Cooking Techniques Used: Highlight the cooking techniques demonstrated in the video, such as searing, blitzing, wrapping, etc.\n"
-# #             "5. Equipment Needed: List all tools, appliances, or utensils mentioned, e.g., blender, hot pan, cling film, etc.\n"
-# #             "6. Nutritional Information (if inferred): Provide an approximate calorie count or nutritional breakdown based on the ingredients used.\n"
-# #             "7. Serving size: In count of people or portion size.\n"
-# #             "8. Special Notes or Variations: Include any specific tips, variations, or alternatives mentioned.\n"
-# #             "9. Festive or Thematic Relevance: Note if the recipe has any special relevance to holidays, events, or seasons.\n"
-# #             f"Text: {transcription}\n"
-# #         )
-
-# #         # Prepare the payload and headers
-# #         payload = {
-# #             "contents": [
-# #                 {
-# #                     "parts": [
-# #                         {"text": prompt}
-# #                     ]
-# #                 }
-# #             ]
-# #         }
-# #         headers = {"Content-Type": "application/json"}
-
-# #         # Send request to Gemini API
-# #         print("Querying Gemini API...")
-# #         response = requests.post(
-# #             f"{GEMINI_API_ENDPOINT}?key={GEMINI_API_KEY}",
-# #             json=payload,
-# #             headers=headers
-# #         )
-# #         response.raise_for_status()
-
-# #         # Extract and return the structured data
-# #         data = response.json()
-# #         return data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "No result found")
-
-# #     except requests.exceptions.RequestException as e:
-# #         print(f"Error querying Gemini API: {e}")
-# #         return {"error": str(e)}
-
-
-# # if __name__ == '__main__':
-# #     app.run(debug=True)
-
-
-
-# ## above code is working fine, on local
-# ## Below code is taken frmo HUggging face ,
-
-
-# # Above code is without polling and sleep
-
-# import os
-# import subprocess
-# import whisper
-# import requests
-# from flask import Flask, request, jsonify, send_file, render_template
-# import tempfile
-
-# app = Flask(__name__)
-
-# # Gemini API settings
-# from dotenv import load_dotenv
-# import requests
-# # Load the .env file
-# load_dotenv()
-
-# # Fetch the API key from the .env file
-# API_KEY = os.getenv("FIRST_API_KEY")
-
-# # Ensure the API key is loaded correctly
-# if not API_KEY:
-#     raise ValueError("API Key not found. Make sure it is set in the .env file.")
-
-# GEMINI_API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
-# GEMINI_API_KEY = API_KEY
-
-# # Load Whisper AI model at startup
-# print("Loading Whisper AI model...")
-# whisper_model = whisper.load_model("base")  # Choose model size: tiny, base, small, medium, large
-# print("Whisper AI model loaded successfully.")
-
-
-# # Define the "/" endpoint for health check
-# @app.route("/", methods=["GET"])
-# def health_check():
-#     return jsonify({"status": "success", "message": "API is running successfully!"}), 200
-
-# @app.route("/mbsa")
-# def mbsa():
-#     return render_template("mbsa.html")
-
-# @app.route('/process-video', methods=['POST'])
-# def process_video():
-#     """
-#     Flask endpoint to process video:
-#     1. Extract audio and transcribe using Whisper AI.
-#     2. Send transcription to Gemini API for recipe information extraction.
-#     3. Return structured data in the response.
-#     """
-#     if 'video' not in request.files:
-#         return jsonify({"error": "No video file provided"}), 400
-
-#     video_file = request.files['video']
-
-#     try:
-#         # Save video to a temporary file
-#         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video_file:
-#             video_file.save(temp_video_file.name)
-#             print(f"Video file saved: {temp_video_file.name}")
-            
-#             # Extract audio and transcribe using Whisper AI
-#             transcription = transcribe_audio(temp_video_file.name)
-
-#             if not transcription:
-#                 return jsonify({"error": "Audio transcription failed"}), 500
-
-#             # Generate structured recipe information using Gemini API
-#             structured_data = query_gemini_api(transcription)
-
-#             return jsonify(structured_data)
-
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-#     finally:
-#         # Clean up temporary files
-#         if os.path.exists(temp_video_file.name):
-#             os.remove(temp_video_file.name)
-
-
-# def transcribe_audio(video_path):
-#     """
-#     Extract audio from video file and transcribe using Whisper AI.
-#     """
-#     try:
-#         # Extract audio using ffmpeg
-#         audio_path = video_path.replace(".mp4", ".wav")
-#         command = [
-#             "ffmpeg",
-#             "-i", video_path,
-#             "-q:a", "0",
-#             "-map", "a",
-#             audio_path
-#         ]
-#         subprocess.run(command, check=True)
-#         print(f"Audio extracted to: {audio_path}")
-
-#         # Transcribe audio using Whisper AI
-#         print("Transcribing audio...")
-#         result = whisper_model.transcribe(audio_path)
-
-#         # Clean up audio file after transcription
-#         if os.path.exists(audio_path):
-#             os.remove(audio_path)
-
-#         return result.get("text", "").strip()
-
-#     except Exception as e:
-#         print(f"Error in transcription: {e}")
-#         return None
-
-
-# def query_gemini_api(transcription):
-#     """
-#     Send transcription text to Gemini API and fetch structured recipe information.
-#     """
-#     try:
-#         # Define the structured prompt
-#         prompt = (
-#             "Analyze the provided cooking video transcription and extract the following structured information:\n"
-#             "1. Recipe Name: Identify the name of the dish being prepared.\n"
-#             "2. Ingredients List: Extract a detailed list of ingredients with their respective quantities (if mentioned).\n"
-#             "3. Steps for Preparation: Provide a step-by-step breakdown of the recipe's preparation process, organized and numbered sequentially.\n"
-#             "4. Cooking Techniques Used: Highlight the cooking techniques demonstrated in the video, such as searing, blitzing, wrapping, etc.\n"
-#             "5. Equipment Needed: List all tools, appliances, or utensils mentioned, e.g., blender, hot pan, cling film, etc.\n"
-#             "6. Nutritional Information (if inferred): Provide an approximate calorie count or nutritional breakdown based on the ingredients used.\n"
-#             "7. Serving size: In count of people or portion size.\n"
-#             "8. Special Notes or Variations: Include any specific tips, variations, or alternatives mentioned.\n"
-#             "9. Festive or Thematic Relevance: Note if the recipe has any special relevance to holidays, events, or seasons.\n"
-#             f"Text: {transcription}\n"
-#         )
-
-#         # Prepare the payload and headers
-#         payload = {
-#             "contents": [
-#                 {
-#                     "parts": [
-#                         {"text": prompt}
-#                     ]
-#                 }
-#             ]
-#         }
-#         headers = {"Content-Type": "application/json"}
-
-#         # Send request to Gemini API
-#         print("Querying Gemini API...")
-#         response = requests.post(
-#             f"{GEMINI_API_ENDPOINT}?key={GEMINI_API_KEY}",
-#             json=payload,
-#             headers=headers
-#         )
-#         response.raise_for_status()
-
-#         # Extract and return the structured data
-#         data = response.json()
-#         return data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "No result found")
-
-#     except requests.exceptions.RequestException as e:
-#         print(f"Error querying Gemini API: {e}")
-#         return {"error": str(e)}
-
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-
-
-# # Above code is taking mp4 input and converts it on it's own to wav
-
-## Below code requires the user to provide the wav file
 import os
 import whisper
 import requests
@@ -347,6 +6,9 @@ from dotenv import load_dotenv
 from deepgram import DeepgramClient, PrerecordedOptions
 import tempfile
 import json
+import subprocess
+from youtube_transcript_api import YouTubeTranscriptApi
+
 
 import warnings
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
@@ -373,69 +35,115 @@ if not DEEPGRAM_API_KEY:
 GEMINI_API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
 GEMINI_API_KEY = API_KEY
 
-# Load Whisper AI model at startup
-# print("Loading Whisper AI model..., ANIKET")
-# whisper_model = whisper.load_model("base")  # Choose model size: tiny, base, small, medium, large
-# print("Whisper AI model loaded successfully, ANIKET")
-
-
 @app.route("/", methods=["GET"])
 def health_check():
     return jsonify({"status": "success", "message": "API is running successfully!"}), 200
 
 
-@app.route("/mbsa")
-def mbsa():
-    return render_template("mbsa.html")
-
+def download_audio(url, temp_audio_path):
+    """Download audio (WAV format) from the given URL and save it to temp_audio_path."""
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        with open(temp_audio_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                f.write(chunk)
+        print(f"Audio downloaded successfully to {temp_audio_path}")
+    else:
+        raise Exception(f"Failed to download audio, status code: {response.status_code}")
 
 @app.route('/process-audio', methods=['POST'])
 def process_audio():
-    print("GOT THE PROCESS AUDIO REQUEST, ANIKET")
-    
-    if 'audio' not in request.files:
-        return jsonify({"error": "No audio file provided"}), 400
+    if 'audioUrl' not in request.json:
+        return jsonify({"error": "No audio URL provided"}), 400
 
-    audio_file = request.files['audio']
-    print("AUDIO FILE NAME: ", audio_file)
-
+    audio_url = request.json['audioUrl']
     temp_audio_path = None
-    try:
-        print("STARTING TRANSCRIPTION, ANIKET")
-        
-        # Step 1: Save the audio file temporarily to a specific location
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio_file:
-            temp_audio_path = temp_audio_file.name  # Get the file path
-            temp_audio_file.write(audio_file.read())  # Write the uploaded audio to the temp file
-        
-        print(f"Temporary audio file saved at: {temp_audio_path}")
-        
-        # Step 2: Transcribe the uploaded audio file synchronously
-        transcription = transcribe_audio(temp_audio_path)
 
-        print("BEFORE THE transcription FAILED ERROR, CHECKING IF I GOT THE TRANSCRIPTION", transcription)
+    try:
+        # Step 1: Download the WAV file from the provided URL
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
+            temp_audio_path = temp_audio_file.name
+            download_audio(audio_url, temp_audio_path)
+
+        # Step 2: Transcribe the downloaded WAV file synchronously
+        transcription = transcribe_audio(temp_audio_path)
 
         if not transcription:
             return jsonify({"error": "Audio transcription failed"}), 500
 
-        print("GOT THE transcription")
-
         # Step 3: Generate structured recipe information using Gemini API synchronously
-        print("Starting the GEMINI REQUEST TO STRUCTURE IT")
         structured_data = query_gemini_api(transcription)
 
-        print("GOT THE STRUCTURED DATA", structured_data)
-        # Step 4: Return the structured data
         return jsonify(structured_data)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
     finally:
-        # Clean up the temporary WAV file
+        # Clean up temporary audio file
         if temp_audio_path and os.path.exists(temp_audio_path):
             os.remove(temp_audio_path)
-            print(f"Temporary WAV file deleted: {temp_audio_path}")
+            print(f"Temporary audio file deleted: {temp_audio_path}")
+
+
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+from urllib.parse import urlparse, parse_qs
+
+def extract_video_id(youtube_url):
+    """
+    Extracts the video ID from a YouTube URL.
+    """
+    try:
+        parsed_url = urlparse(youtube_url)
+        query_params = parse_qs(parsed_url.query)
+        video_id = query_params.get('v', [None])[0]
+        return video_id
+    except Exception as e:
+        print(f"Error extracting video ID: {e}")
+        return None
+
+
+@app.route('/process-youtube', methods=['POST'])
+def process_youtube():
+    youtube_url = request.json.get('youtube_url')
+    
+    if not youtube_url:
+        return jsonify({"error": "No YouTube URL provided"}), 400
+
+    try:
+        # Extract the video ID from the YouTube URL
+        video_id = extract_video_id(youtube_url)
+        
+        logging.debug(f"Processing video ID: {video_id}")
+        
+        try:
+            # Fetch transcript
+            # transcript_data = YouTubeTranscriptApi.get_transcript(video_id)
+            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            transcript_data = transcript_list.find_generated_transcript(['en'])
+
+            transcript = transcript_data.fetch()[0]
+            
+        except Exception as e:
+            logging.error(f"Error fetching transcript for {video_id}: {e}")
+            return jsonify({"error": f"Could not retrieve transcript for video {video_id}: {str(e)}"}), 500
+
+        # Concatenate transcript
+        # transcript = " ".join([segment['text'] for segment in transcript_data])
+        logging.debug(f"Transcript: {transcript}")
+
+        # Send to Gemini API
+        structured_data = query_gemini_api(transcript)
+
+        # Return structured data
+        return jsonify(structured_data)
+
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 
@@ -468,7 +176,7 @@ def transcribe_audio(wav_file_path):
 
             # Check if the response is valid
             if response:
-                print("Request successful! Processing response.")
+                # print("Request successful! Processing response.")
 
                 # Convert response to JSON string
                 try:
@@ -493,7 +201,7 @@ def transcribe_audio(wav_file_path):
                 transcript_file_path = "transcript_from_transcribe_audio.txt"
                 with open(transcript_file_path, "w", encoding="utf-8") as transcript_file:
                     transcript_file.write(transcript)
-                print(f"Transcript saved to file: {transcript_file_path}")
+                # print(f"Transcript saved to file: {transcript_file_path}")
                 
                 return transcript
             else:
@@ -517,7 +225,6 @@ def query_gemini_api(transcription):
     try:
         # Define the structured prompt
         prompt = (
-            "Print the transcription in the response as well"
             "Analyze the provided cooking video transcription and extract the following structured information:\n"
             "1. Recipe Name: Identify the name of the dish being prepared.\n"
             "2. Ingredients List: Extract a detailed list of ingredients with their respective quantities (if mentioned).\n"
@@ -541,7 +248,6 @@ def query_gemini_api(transcription):
                 }
             ]
         }
-        
         headers = {"Content-Type": "application/json"}
 
         # Send request to Gemini API synchronously
@@ -549,7 +255,6 @@ def query_gemini_api(transcription):
             f"{GEMINI_API_ENDPOINT}?key={GEMINI_API_KEY}",
             json=payload,
             headers=headers,
-            
         )
 
         # Raise error if response code is not 200
