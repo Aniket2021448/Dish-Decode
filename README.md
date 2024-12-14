@@ -82,4 +82,14 @@ Step 5: Then this structured information is sent over to the backend which sense
   which has text description in the video
   https://www.geeksforgeeks.org/text-detection-and-extraction-using-opencv-and-ocr/ 
   
+  Download the tesseract-OCR executable file from it's github (https://github.com/UB-Mannheim/tesseract/wiki)
+  install in the desired directory, add this directory to the path variables in system environments
   
+  This is done to handle the case of videos where audio description is not present in the video
+  This, OCR extracts the textual data and present in the video, extracts it from the frames at an interval of 2 seconds. 
+
+# Final response
+  It is made using the information from the audio transcription (DeepgramNovo) and video information extraction(tesseract-OCR) combined we are handling a much wider range of types of recipe videos
+
+  The information is combined and then sent to the Gemini1.5 Flash API to get the structured information we desire, 
+  with the help of AI we are able to get the data in proper format and meaningful extraction was possible.
