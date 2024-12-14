@@ -93,3 +93,193 @@ Step 5: Then this structured information is sent over to the backend which sense
 
   The information is combined and then sent to the Gemini1.5 Flash API to get the structured information we desire, 
   with the help of AI we are able to get the data in proper format and meaningful extraction was possible.
+
+  # 🍽️ Recipe Extraction API
+
+This project is a Flask-based API that extracts structured recipe information from cooking tutorial videos! It uses the **Deepgram API** for audio transcription, **Tesseract OCR** for text extraction from video frames, and the **Gemini API** to generate a well-structured recipe document. 🚀
+
+---
+
+## 📦 Project Setup
+
+Follow these steps to set up and run the project on your local machine.
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone <your-repo-url>
+cd <your-repo-folder>
+```
+
+### 2️⃣ Install Dependencies
+
+Make sure you have Python installed (Python 3.8 or above is recommended). Install the required libraries using pip:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3️⃣ Install Tesseract OCR
+
+Ensure **Tesseract OCR** is installed on your system. You can download it here: [Tesseract GitHub](https://github.com/tesseract-ocr/tesseract)
+
+Add Tesseract to your system path and make sure to note its installation location.
+
+#### On Windows:
+
+Add the path to `tesseract.exe` to your environment variables, e.g.:
+
+```bash
+C:\Program Files\Tesseract-OCR
+```
+
+#### On MacOS (using Homebrew):
+
+```bash
+brew install tesseract
+```
+
+#### On Ubuntu:
+
+```bash
+sudo apt-get install tesseract-ocr
+```
+
+### 4️⃣ Setup Environment Variables
+
+Create a `.env` file in the root directory and add your API keys:
+
+```plaintext
+FIRST_API_KEY=<Your Gemini API Key>
+SECOND_API_KEY=<Your Deepgram API Key>
+```
+
+### 5️⃣ Install FFmpeg
+
+This project uses **FFmpeg** for converting MP4 videos to WAV audio. Install it via the following:
+
+#### On MacOS (using Homebrew):
+
+```bash
+brew install ffmpeg
+```
+
+#### On Ubuntu:
+
+```bash
+sudo apt-get install ffmpeg
+```
+
+#### On Windows:
+
+Download FFmpeg from [FFmpeg.org](https://ffmpeg.org/download.html) and add it to your system path.
+
+---
+
+## 🚀 Running the Project
+
+Start the Flask server with the following command:
+
+```bash
+python app.py
+```
+
+If everything is set up correctly, you should see:
+
+```plaintext
+ * Running on http://127.0.0.1:5000/
+```
+
+---
+
+## 📡 API Endpoints
+
+### ✅ Health Check
+
+**Endpoint:** `GET /`
+
+Check if the API is running.
+
+```bash
+curl http://127.0.0.1:5000/
+```
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "API is running successfully!"
+}
+```
+
+### 🍲 Recipe Extraction
+
+**Endpoint:** `POST /process-video`
+
+#### Request Body:
+
+Send a JSON payload with a video URL:
+
+```json
+{
+    "videoUrl": "<URL-of-the-cooking-video>"
+}
+```
+
+#### Example Using `curl`:
+
+```bash
+curl -X POST http://127.0.0.1:5000/process-video \
+-H "Content-Type: application/json" \
+-d '{"videoUrl": "https://example.com/video.mp4"}'
+```
+
+#### Sample Response:
+
+```json
+{
+    "**1. Recipe Name:**": "Beef Wellington",
+    "**2. Ingredients List:**": "* Fillet of beef\n* Olive oil\n* Salt\n* Pepper",
+    "**3. Steps for Preparation:**": "1. Sear the beef fillet\n2. Brush with mustard",
+    "**4. Cooking Techniques Used:**": "* Searing\n* Wrapping",
+    "**5. Equipment Needed:**": "* Hot pan\n* Blender",
+    "**6. Nutritional Information:**": "High in protein and fat",
+    "**7. Serving size:**": "2-4 people",
+    "**8. Special Notes or Variations:**": "Use horseradish instead of mustard",
+    "**9. Festive or Thematic Relevance:**": "Christmas alternative to roast turkey"
+}
+```
+
+---
+
+## 🛠️ Key Features
+
+- **Deepgram API** for accurate audio transcription.
+- **Tesseract OCR** for extracting text from video frames.
+- **Gemini API** for generating structured recipe information.
+- **FFmpeg** for seamless MP4-to-WAV conversion.
+- Supports both audio and video analysis for enhanced accuracy. 🎯
+
+---
+
+## 🧪 Testing
+
+Use tools like **Postman** or **curl** to test the API endpoints.
+
+---
+
+## 🤝 Contributions
+
+Contributions are welcome! Feel free to submit a pull request or open an issue for any enhancements or bug fixes.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+### 🌟 Happy Coding and Bon Appétit! 👨‍🍳👩‍🍳
+
