@@ -82,3 +82,4 @@ Step 5: Then this structured information is sent over to the backend which sense
   which has text description in the video
   https://www.geeksforgeeks.org/text-detection-and-extraction-using-opencv-and-ocr/ 
   
+  

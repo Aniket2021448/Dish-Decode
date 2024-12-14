@@ -3,37 +3,120 @@ import requests
 import cv2
 import re
 import pytesseract
-from flask import Flask, request, jsonify
-from google.generativeai import GenerativeModel, configure
+from flask import Flask, request, jsonify, render_template
+from deepgram import DeepgramClient, PrerecordedOptions
 from dotenv import load_dotenv
+import tempfile
+import json
+import subprocess
+import warnings
 
+warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
-# Flask app
 app = Flask(__name__)
+print("APP IS RUNNING, ANIKET")
 
-# Configure Tesseract OCR path
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# Load the .env file
+load_dotenv()
 
-# Configure Google Gemini API key
-configure(api_key='YOUR_GEMINI_API_KEY')
-gemini_model = GenerativeModel('gemini-pro')
+print("ENV LOADED, ANIKET")
 
-# Directory to save downloaded videos
-DOWNLOAD_DIR = 'downloads'
-os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+# Fetch the API key from the .env file
+API_KEY = os.getenv("FIRST_API_KEY")
+DEEPGRAM_API_KEY = os.getenv("SECOND_API_KEY")
 
-def download_video(cloudinary_url):
-    """Download video from Cloudinary link and return the local file path."""
-    response = requests.get(cloudinary_url, stream=True)
+# Ensure the API key is loaded correctly
+if not API_KEY:
+    raise ValueError("API Key not found. Make sure it is set in the .env file.")
+
+if not DEEPGRAM_API_KEY:
+    raise ValueError("DEEPGRAM_API_KEY not found. Make sure it is set in the .env file.")
+
+GEMINI_API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
+GEMINI_API_KEY = API_KEY
+
+@app.route("/", methods=["GET"])
+def health_check():
+    return jsonify({"status": "success", "message": "API is running successfully!"}), 200
+
+
+def transcribe_audio(wav_file_path):
+    """
+    Transcribe audio from a video file using Deepgram API synchronously.
+    
+    Args:
+        wav_file_path (str): Path to save the converted WAV file.
+    Returns:
+        dict: A dictionary containing status, transcript, or error message.
+    """
+    print("Entered the transcribe_audio function")
+    try:
+        # Initialize Deepgram client
+        deepgram = DeepgramClient(DEEPGRAM_API_KEY)
+
+        # Open the converted WAV file
+        with open(wav_file_path, 'rb') as buffer_data:
+            payload = {'buffer': buffer_data}
+
+            # Configure transcription options
+            options = PrerecordedOptions(
+                smart_format=True, model="nova-2", language="en-US"
+            )
+
+            # Transcribe the audio
+            response = deepgram.listen.prerecorded.v('1').transcribe_file(payload, options)
+
+            # Check if the response is valid
+            if response:
+                try:
+                    data_str = response.to_json(indent=4)
+                except AttributeError as e:
+                    return {"status": "error", "message": f"Error converting response to JSON: {e}"}
+
+                # Parse the JSON string to a Python dictionary
+                try:
+                    data = json.loads(data_str)
+                except json.JSONDecodeError as e:
+                    return {"status": "error", "message": f"Error parsing JSON string: {e}"}
+
+                # Extract the transcript
+                try:
+                    transcript = data["results"]["channels"][0]["alternatives"][0]["transcript"]
+                except KeyError as e:
+                    return {"status": "error", "message": f"Error extracting transcript: {e}"}
+
+                print(f"Transcript obtained: {transcript}")
+                # Save the transcript to a text file
+                transcript_file_path = "transcript_from_transcribe_audio.txt"
+                with open(transcript_file_path, "w", encoding="utf-8") as transcript_file:
+                    transcript_file.write(transcript)
+                
+                return transcript
+            else:
+                return {"status": "error", "message": "Invalid response from Deepgram."}
+
+    except FileNotFoundError:
+        return {"status": "error", "message": f"Video file not found: {wav_file_path}"}
+    except Exception as e:
+        return {"status": "error", "message": f"Unexpected error: {e}"}
+    finally:
+        # Clean up the temporary WAV file
+        if os.path.exists(wav_file_path):
+            os.remove(wav_file_path)
+            print(f"Temporary WAV file deleted: {wav_file_path}")
+
+
+def download_video(url, temp_video_path):
+    """Download video (MP4 format) from the given URL and save it to temp_video_path."""
+    response = requests.get(url, stream=True)
     if response.status_code == 200:
-        video_path = os.path.join(DOWNLOAD_DIR, 'downloaded_video.mp4')
-        with open(video_path, 'wb') as f:
+        with open(temp_video_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):
                 f.write(chunk)
-        print(f"Video downloaded successfully to {video_path}")
-        return video_path
+        print(f"Audio downloaded successfully to {temp_video_path}")
     else:
-        raise Exception(f"Failed to download video: {response.status_code}")
+        raise Exception(f"Failed to download audio, status code: {response.status_code}")
+
 
 def preprocess_frame(frame):
     """Preprocess the frame for better OCR accuracy."""
@@ -43,18 +126,20 @@ def preprocess_frame(frame):
     return thresh
 
 def clean_ocr_text(text):
-    """Clean the OCR output by removing noise and unwanted characters."""
+    """Clean the OCR output by removing noise and unwanted characters.""" 
     cleaned_text = re.sub(r'[^A-Za-z0-9\s,.!?-]', '', text)
     cleaned_text = '\n'.join([line.strip() for line in cleaned_text.splitlines() if len(line.strip()) > 2])
     return cleaned_text
 
-def extract_text_from_video(video_path, interval=1):
-    """Extract text from video and return the text content."""
+def get_information_from_video_using_OCR(video_path, interval=2):
+    """Extract text from video frames using OCR and return the combined text content."""
     cap = cv2.VideoCapture(video_path)
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     frame_interval = interval * fps
     frame_count = 0
     extracted_text = ""
+
+    print("Starting text extraction from video...")
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -62,52 +147,138 @@ def extract_text_from_video(video_path, interval=1):
             break
 
         if frame_count % frame_interval == 0:
-            preprocessed_frame = preprocess_frame(frame)
+            timestamp = frame_count / fps  # Calculate timestamp in seconds
+            preprocessed_frame = preprocess_frame(frame)  # Preprocess the frame
+
+            # Perform OCR on the preprocessed frame
             text = pytesseract.image_to_string(preprocessed_frame, lang='eng', config='--psm 6 --oem 3')
             cleaned_text = clean_ocr_text(text)
+
             if cleaned_text:
                 extracted_text += cleaned_text + "\n\n"
-                # Save the first frame with text
-                if frame_count == 0:
-                    cv2.imwrite("first_frame.png", frame)
+                # print(f"Text found at frame {frame_count}: {cleaned_text[:50]}...")
+
+
 
         frame_count += 1
 
     cap.release()
+    print("Text extraction completed.")
     return extracted_text
 
-def send_to_gemini(text):
-    """Send extracted text to Gemini API and return structured information."""
-    prompt = f"Please structure the following extracted recipe information:\n\n{text}"
-    response = gemini_model.generate_content(prompt)
-    return response.text
+
+def convert_mp4_to_wav(mp4_path, wav_path):
+    """Convert an MP4 file to a WAV file."""
+    command = f"ffmpeg -y -i {mp4_path} -vn -acodec pcm_s16le -ar 44100 -ac 2 {wav_path}"
+    subprocess.run(command, shell=True, check=True)
+    print(f"MP4 file converted to WAV: {wav_path}")
+
 
 @app.route('/process-video', methods=['POST'])
 def process_video():
-    """Endpoint to process video from Cloudinary link."""
+    if 'videoUrl' not in request.json:
+        return jsonify({"error": "No video URL provided"}), 400
+
+    video_url = request.json['videoUrl']
+    temp_video_path = None
+    temp_wav_path = None
+    
     try:
-        # Get Cloudinary link from request
-        data = request.json
-        cloudinary_url = data.get('cloudinary_url')
-        if not cloudinary_url:
-            return jsonify({"error": "No Cloudinary URL provided"}), 400
+        # Step 1: Download the MP4 file from the provided URL
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video_file:
+            temp_video_path = temp_video_file.name
+            download_video(video_url, temp_video_path)
 
-        # Download video
-        video_path = download_video(cloudinary_url)
+        # Step 2: Get the information from the downloaded MP4 file synchronously
+        video_info = get_information_from_video_using_OCR(temp_video_path, interval=2)
 
-        # Extract text from video
-        extracted_text = extract_text_from_video(video_path)
-        if not extracted_text:
-            return jsonify({"error": "No text found in the video"}), 400
+        if not video_info:
+            video_info = ""
 
-        # Send extracted text to Gemini API
-        structured_info = send_to_gemini(extracted_text)
+        # Step 3: Convert the MP4 to WAV
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav_file:
+            temp_wav_path = temp_wav_file.name
+            convert_mp4_to_wav(temp_video_path, temp_wav_path)
 
-        # Return structured information
-        return jsonify({"structured_info": structured_info})
+        # Step 4: Transcribe the audio
+        audio_info = transcribe_audio(temp_wav_path)
+        
+        # If no transcription is present, use an empty string
+        if not audio_info:
+            audio_info = ""
+
+        # Step 5: Generate structured recipe information using Gemini API synchronously
+        structured_data = query_gemini_api(video_info, audio_info)
+
+        return jsonify(structured_data)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
+    finally:
+        # Clean up temporary video file and WAV file
+        if temp_video_path and os.path.exists(temp_video_path):
+            os.remove(temp_video_path)
+            print(f"Temporary video file deleted: {temp_video_path}")
+
+        if temp_wav_path and os.path.exists(temp_wav_path):
+            os.remove(temp_wav_path)
+            print(f"Temporary WAV file deleted: {temp_wav_path}")
+
+
+def query_gemini_api(video_transcription, audio_transcription):
+    """
+    Send transcription text to Gemini API and fetch structured recipe information synchronously.
+    """
+    transcription = f"audio transcription: {audio_transcription} and video transcription: {video_transcription}"
+    try:
+        # Define the structured prompt
+        prompt = (
+            "Analyze the provided cooking video and audio transcription combined and based on the combined information extract the following structured information:\n"
+            "1. Recipe Name: Identify the name of the dish being prepared.\n"
+            "2. Ingredients List: Extract a detailed list of ingredients with their respective quantities (if mentioned).\n"
+            "3. Steps for Preparation: Provide a step-by-step breakdown of the recipe's preparation process, organized and numbered sequentially.\n"
+            "4. Cooking Techniques Used: Highlight the cooking techniques demonstrated in the video, such as searing, blitzing, wrapping, etc.\n"
+            "5. Equipment Needed: List all tools, appliances, or utensils mentioned, e.g., blender, hot pan, cling film, etc.\n"
+            "6. Nutritional Information (if inferred): Provide an approximate calorie count or macro nutritional breakdown based on the recipe cooked and your understanding, the carbs, protein and other macros.\n"
+            "7. Serving size: In count of people or portion size according to you and the recipe cooked e.g., 2 people, 4 people, 2 bowls, 2 cups.\n"
+            "8. Special Notes or Variations: Include any specific tips, variations, or alternatives mentioned.\n"
+            "9. Festive or Thematic Relevance: Note if the recipe has any special relevance to holidays, events, or seasons.\n"
+            "There are errors and missing parts in the video transcription part, if something is not able to interpret from the video information use the audio information\n"
+            "If you are not able to get required information, return empty texts for the fields that I asked above instead of giving any other text response."
+            f"Text: {transcription}\n"
+        )
+
+        # Prepare the payload and headers
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ]
+        }
+        headers = {"Content-Type": "application/json"}
+
+        # Send request to Gemini API synchronously
+        response = requests.post(
+            f"{GEMINI_API_ENDPOINT}?key={GEMINI_API_KEY}",
+            json=payload,
+            headers=headers,
+        )
+
+        # Raise error if response code is not 200
+        response.raise_for_status()
+
+        data = response.json()
+
+        return data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "No result found")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error querying Gemini API: {e}")
+        return {"error": str(e)}
+
+
+if __name__ == '__main__':
     app.run(debug=True)
